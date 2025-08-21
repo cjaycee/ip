@@ -3,10 +3,10 @@ import java.util.ArrayList;
 
 public class Usagi {
 
-    // Task class to represent each task with its description and status
-    static class Task {
-        String description;
-        boolean isDone;
+    // Base Task class
+    abstract static class Task {
+        protected String description;
+        protected boolean isDone;
 
         Task(String description) {
             this.description = description;
@@ -28,6 +28,84 @@ public class Usagi {
         @Override
         public String toString() {
             return getStatusIcon() + " " + description;
+        }
+
+        // Abstract method to be implemented by subclasses
+        abstract String getTaskType();
+        abstract String getFullDescription();
+    }
+
+    // Todo class
+    static class Todo extends Task {
+        Todo(String description) {
+            super(description);
+        }
+
+        @Override
+        String getTaskType() {
+            return "[T]";
+        }
+
+        @Override
+        String getFullDescription() {
+            return getTaskType() + super.toString();
+        }
+
+        @Override
+        public String toString() {
+            return getFullDescription();
+        }
+    }
+
+    // Deadline class
+    static class Deadline extends Task {
+        protected String by;
+
+        Deadline(String description, String by) {
+            super(description);
+            this.by = by;
+        }
+
+        @Override
+        String getTaskType() {
+            return "[D]";
+        }
+
+        @Override
+        String getFullDescription() {
+            return getTaskType() + super.toString() + " (by: " + by + ")";
+        }
+
+        @Override
+        public String toString() {
+            return getFullDescription();
+        }
+    }
+
+    // Event class
+    static class Event extends Task {
+        protected String from;
+        protected String to;
+
+        Event(String description, String from, String to) {
+            super(description);
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override
+        String getTaskType() {
+            return "[E]";
+        }
+
+        @Override
+        String getFullDescription() {
+            return getTaskType() + super.toString() + " (from: " + from + " to: " + to + ")";
+        }
+
+        @Override
+        public String toString() {
+            return getFullDescription();
         }
     }
 
@@ -52,8 +130,23 @@ public class Usagi {
                 markTask(tasks, input, true);
             } else if (input.startsWith("unmark ")) {
                 markTask(tasks, input, false);
+            } else if (input.startsWith("todo ")) {
+                addTodoTask(tasks, input);
+            } else if (input.startsWith("deadline ")) {
+                addDeadlineTask(tasks, input);
+            } else if (input.startsWith("event ")) {
+                addEventTask(tasks, input);
             } else if (!input.isEmpty()) {
-                addTask(tasks, input);
+                System.out.println("____________________________________________________________");
+                System.out.println("Sorry, I don't understand that command. Please use one of:");
+                System.out.println("  todo <description>");
+                System.out.println("  deadline <description> /by <time>");
+                System.out.println("  event <description> /from <start> /to <end>");
+                System.out.println("  list");
+                System.out.println("  mark <number>");
+                System.out.println("  unmark <number>");
+                System.out.println("  bye");
+                System.out.println("____________________________________________________________");
             }
         }
 
@@ -76,17 +169,102 @@ public class Usagi {
         System.out.println("____________________________________________________________");
     }
 
-    private static void addTask(ArrayList<Task> tasks, String description) {
-        Task newTask = new Task(description);
+    private static void addTodoTask(ArrayList<Task> tasks, String input) {
+        String description = input.substring(5).trim();
+        if (description.isEmpty()) {
+            System.out.println("____________________________________________________________");
+            System.out.println("Oops! The description of a todo cannot be empty.");
+            System.out.println("Usage: todo <description>");
+            System.out.println("____________________________________________________________");
+            return;
+        }
+
+        Task newTask = new Todo(description);
         tasks.add(newTask);
         System.out.println("____________________________________________________________");
-        System.out.println("added: " + description);
+        System.out.println("Got it. I've added this task:");
+        System.out.println("  " + newTask.toString());
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+        System.out.println("____________________________________________________________");
+    }
+
+    private static void addDeadlineTask(ArrayList<Task> tasks, String input) {
+        String withoutPrefix = input.substring(9).trim();
+        String[] parts = withoutPrefix.split("/by", 2);
+
+        if (parts.length < 2) {
+            System.out.println("____________________________________________________________");
+            System.out.println("Oops! Please use the format: deadline <description> /by <time>");
+            System.out.println("Example: deadline return book /by Sunday");
+            System.out.println("____________________________________________________________");
+            return;
+        }
+
+        String description = parts[0].trim();
+        String by = parts[1].trim();
+
+        if (description.isEmpty() || by.isEmpty()) {
+            System.out.println("____________________________________________________________");
+            System.out.println("Oops! Both description and time are required for deadline.");
+            System.out.println("Usage: deadline <description> /by <time>");
+            System.out.println("____________________________________________________________");
+            return;
+        }
+
+        Task newTask = new Deadline(description, by);
+        tasks.add(newTask);
+        System.out.println("____________________________________________________________");
+        System.out.println("Got it. I've added this task:");
+        System.out.println("  " + newTask.toString());
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+        System.out.println("____________________________________________________________");
+    }
+
+    private static void addEventTask(ArrayList<Task> tasks, String input) {
+        String withoutPrefix = input.substring(6).trim();
+        String[] parts = withoutPrefix.split("/from", 2);
+
+        if (parts.length < 2) {
+            System.out.println("____________________________________________________________");
+            System.out.println("Oops! Please use the format: event <description> /from <start> /to <end>");
+            System.out.println("Example: event project meeting /from Mon 2pm /to 4pm");
+            System.out.println("____________________________________________________________");
+            return;
+        }
+
+        String description = parts[0].trim();
+        String[] timeParts = parts[1].split("/to", 2);
+
+        if (timeParts.length < 2) {
+            System.out.println("____________________________________________________________");
+            System.out.println("Oops! Please include both start and end times.");
+            System.out.println("Usage: event <description> /from <start> /to <end>");
+            System.out.println("____________________________________________________________");
+            return;
+        }
+
+        String from = timeParts[0].trim();
+        String to = timeParts[1].trim();
+
+        if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
+            System.out.println("____________________________________________________________");
+            System.out.println("Oops! Description, start time, and end time are all required for events.");
+            System.out.println("Usage: event <description> /from <start> /to <end>");
+            System.out.println("____________________________________________________________");
+            return;
+        }
+
+        Task newTask = new Event(description, from, to);
+        tasks.add(newTask);
+        System.out.println("____________________________________________________________");
+        System.out.println("Got it. I've added this task:");
+        System.out.println("  " + newTask.toString());
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
         System.out.println("____________________________________________________________");
     }
 
     private static void markTask(ArrayList<Task> tasks, String input, boolean markAsDone) {
         try {
-            // Extract the task number from the input
             int taskNumber = Integer.parseInt(input.split(" ")[1]) - 1;
 
             if (taskNumber >= 0 && taskNumber < tasks.size()) {
