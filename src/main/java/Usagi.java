@@ -3,6 +3,37 @@ import java.util.ArrayList;
 
 public class Usagi {
 
+    // Custom exception classes
+    static class UsagiException extends Exception {
+        public UsagiException(String message) {
+            super(message);
+        }
+    }
+
+    static class EmptyDescriptionException extends UsagiException {
+        public EmptyDescriptionException(String taskType) {
+            super("The description of a " + taskType + " cannot be empty.");
+        }
+    }
+
+    static class InvalidCommandException extends UsagiException {
+        public InvalidCommandException() {
+            super("I'm sorry, but I don't know what that means. Please try again!");
+        }
+    }
+
+    static class InvalidFormatException extends UsagiException {
+        public InvalidFormatException(String correctFormat) {
+            super("Please use the correct format: " + correctFormat);
+        }
+    }
+
+    static class InvalidTaskNumberException extends UsagiException {
+        public InvalidTaskNumberException(int maxTasks) {
+            super("Please enter a valid task number between 1 and " + maxTasks);
+        }
+    }
+
     // Base Task class
     abstract static class Task {
         protected String description;
@@ -30,7 +61,6 @@ public class Usagi {
             return getStatusIcon() + " " + description;
         }
 
-        // Abstract method to be implemented by subclasses
         abstract String getTaskType();
         abstract String getFullDescription();
     }
@@ -114,39 +144,34 @@ public class Usagi {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("____________________________________________________________");
-        System.out.println("Hello! I'm Usagi");
+        System.out.println("Hello! I'm Usagi, your friendly task manager!");
         System.out.println("What can I do for you?");
         System.out.println("____________________________________________________________");
 
         String input;
         while (true) {
-            input = scanner.nextLine().trim();
+            try {
+                input = scanner.nextLine().trim();
 
-            if (input.equalsIgnoreCase("bye")) {
-                break;
-            } else if (input.equalsIgnoreCase("list")) {
-                displayTaskList(tasks);
-            } else if (input.startsWith("mark ")) {
-                markTask(tasks, input, true);
-            } else if (input.startsWith("unmark ")) {
-                markTask(tasks, input, false);
-            } else if (input.startsWith("todo ")) {
-                addTodoTask(tasks, input);
-            } else if (input.startsWith("deadline ")) {
-                addDeadlineTask(tasks, input);
-            } else if (input.startsWith("event ")) {
-                addEventTask(tasks, input);
-            } else if (!input.isEmpty()) {
-                System.out.println("____________________________________________________________");
-                System.out.println("Sorry, I don't understand that command. Please use one of:");
-                System.out.println("  todo <description>");
-                System.out.println("  deadline <description> /by <time>");
-                System.out.println("  event <description> /from <start> /to <end>");
-                System.out.println("  list");
-                System.out.println("  mark <number>");
-                System.out.println("  unmark <number>");
-                System.out.println("  bye");
-                System.out.println("____________________________________________________________");
+                if (input.equalsIgnoreCase("bye")) {
+                    break;
+                } else if (input.equalsIgnoreCase("list")) {
+                    displayTaskList(tasks);
+                } else if (input.startsWith("mark ")) {
+                    handleMarkCommand(tasks, input, true);
+                } else if (input.startsWith("unmark ")) {
+                    handleMarkCommand(tasks, input, false);
+                } else if (input.startsWith("todo ")) {
+                    addTodoTask(tasks, input);
+                } else if (input.startsWith("deadline ")) {
+                    addDeadlineTask(tasks, input);
+                } else if (input.startsWith("event ")) {
+                    addEventTask(tasks, input);
+                } else if (!input.isEmpty()) {
+                    throw new InvalidCommandException();
+                }
+            } catch (UsagiException e) {
+                printErrorMessage(e.getMessage());
             }
         }
 
@@ -154,6 +179,12 @@ public class Usagi {
         System.out.println("Bye. Hope to see you again soon!");
         System.out.println("____________________________________________________________");
         scanner.close();
+    }
+
+    private static void printErrorMessage(String message) {
+        System.out.println("____________________________________________________________");
+        System.out.println("Oops! " + message);
+        System.out.println("____________________________________________________________");
     }
 
     private static void displayTaskList(ArrayList<Task> tasks) {
@@ -169,14 +200,10 @@ public class Usagi {
         System.out.println("____________________________________________________________");
     }
 
-    private static void addTodoTask(ArrayList<Task> tasks, String input) {
+    private static void addTodoTask(ArrayList<Task> tasks, String input) throws UsagiException {
         String description = input.substring(5).trim();
         if (description.isEmpty()) {
-            System.out.println("____________________________________________________________");
-            System.out.println("Oops! The description of a todo cannot be empty.");
-            System.out.println("Usage: todo <description>");
-            System.out.println("____________________________________________________________");
-            return;
+            throw new EmptyDescriptionException("todo");
         }
 
         Task newTask = new Todo(description);
@@ -188,27 +215,26 @@ public class Usagi {
         System.out.println("____________________________________________________________");
     }
 
-    private static void addDeadlineTask(ArrayList<Task> tasks, String input) {
+    private static void addDeadlineTask(ArrayList<Task> tasks, String input) throws UsagiException {
         String withoutPrefix = input.substring(9).trim();
+        if (withoutPrefix.isEmpty()) {
+            throw new EmptyDescriptionException("deadline");
+        }
+
         String[] parts = withoutPrefix.split("/by", 2);
 
         if (parts.length < 2) {
-            System.out.println("____________________________________________________________");
-            System.out.println("Oops! Please use the format: deadline <description> /by <time>");
-            System.out.println("Example: deadline return book /by Sunday");
-            System.out.println("____________________________________________________________");
-            return;
+            throw new InvalidFormatException("deadline <description> /by <time>");
         }
 
         String description = parts[0].trim();
         String by = parts[1].trim();
 
-        if (description.isEmpty() || by.isEmpty()) {
-            System.out.println("____________________________________________________________");
-            System.out.println("Oops! Both description and time are required for deadline.");
-            System.out.println("Usage: deadline <description> /by <time>");
-            System.out.println("____________________________________________________________");
-            return;
+        if (description.isEmpty()) {
+            throw new EmptyDescriptionException("deadline");
+        }
+        if (by.isEmpty()) {
+            throw new InvalidFormatException("deadline <description> /by <time> (time cannot be empty)");
         }
 
         Task newTask = new Deadline(description, by);
@@ -220,38 +246,33 @@ public class Usagi {
         System.out.println("____________________________________________________________");
     }
 
-    private static void addEventTask(ArrayList<Task> tasks, String input) {
+    private static void addEventTask(ArrayList<Task> tasks, String input) throws UsagiException {
         String withoutPrefix = input.substring(6).trim();
+        if (withoutPrefix.isEmpty()) {
+            throw new EmptyDescriptionException("event");
+        }
+
         String[] parts = withoutPrefix.split("/from", 2);
 
         if (parts.length < 2) {
-            System.out.println("____________________________________________________________");
-            System.out.println("Oops! Please use the format: event <description> /from <start> /to <end>");
-            System.out.println("Example: event project meeting /from Mon 2pm /to 4pm");
-            System.out.println("____________________________________________________________");
-            return;
+            throw new InvalidFormatException("event <description> /from <start> /to <end>");
         }
 
         String description = parts[0].trim();
         String[] timeParts = parts[1].split("/to", 2);
 
         if (timeParts.length < 2) {
-            System.out.println("____________________________________________________________");
-            System.out.println("Oops! Please include both start and end times.");
-            System.out.println("Usage: event <description> /from <start> /to <end>");
-            System.out.println("____________________________________________________________");
-            return;
+            throw new InvalidFormatException("event <description> /from <start> /to <end>");
         }
 
         String from = timeParts[0].trim();
         String to = timeParts[1].trim();
 
-        if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-            System.out.println("____________________________________________________________");
-            System.out.println("Oops! Description, start time, and end time are all required for events.");
-            System.out.println("Usage: event <description> /from <start> /to <end>");
-            System.out.println("____________________________________________________________");
-            return;
+        if (description.isEmpty()) {
+            throw new EmptyDescriptionException("event");
+        }
+        if (from.isEmpty() || to.isEmpty()) {
+            throw new InvalidFormatException("event <description> /from <start> /to <end> (times cannot be empty)");
         }
 
         Task newTask = new Event(description, from, to);
@@ -263,36 +284,36 @@ public class Usagi {
         System.out.println("____________________________________________________________");
     }
 
-    private static void markTask(ArrayList<Task> tasks, String input, boolean markAsDone) {
+    private static void handleMarkCommand(ArrayList<Task> tasks, String input, boolean markAsDone) throws UsagiException {
         try {
-            int taskNumber = Integer.parseInt(input.split(" ")[1]) - 1;
+            String[] parts = input.split(" ", 2);
+            if (parts.length < 2) {
+                throw new InvalidFormatException((markAsDone ? "mark" : "unmark") + " <task-number>");
+            }
 
-            if (taskNumber >= 0 && taskNumber < tasks.size()) {
-                Task task = tasks.get(taskNumber);
+            int taskNumber = Integer.parseInt(parts[1]) - 1;
 
-                if (markAsDone) {
-                    task.markAsDone();
-                    System.out.println("____________________________________________________________");
-                    System.out.println("Nice! I've marked this task as done:");
-                    System.out.println("  " + task.toString());
-                    System.out.println("____________________________________________________________");
-                } else {
-                    task.markAsNotDone();
-                    System.out.println("____________________________________________________________");
-                    System.out.println("OK, I've marked this task as not done yet:");
-                    System.out.println("  " + task.toString());
-                    System.out.println("____________________________________________________________");
-                }
-            } else {
+            if (taskNumber < 0 || taskNumber >= tasks.size()) {
+                throw new InvalidTaskNumberException(tasks.size());
+            }
+
+            Task task = tasks.get(taskNumber);
+
+            if (markAsDone) {
+                task.markAsDone();
                 System.out.println("____________________________________________________________");
-                System.out.println("Invalid task number! Please enter a number between 1 and " + tasks.size());
+                System.out.println("Nice! I've marked this task as done:");
+                System.out.println("  " + task.toString());
+                System.out.println("____________________________________________________________");
+            } else {
+                task.markAsNotDone();
+                System.out.println("____________________________________________________________");
+                System.out.println("OK, I've marked this task as not done yet:");
+                System.out.println("  " + task.toString());
                 System.out.println("____________________________________________________________");
             }
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            System.out.println("____________________________________________________________");
-            System.out.println("Please specify a valid task number after '" + (markAsDone ? "mark" : "unmark") + "'");
-            System.out.println("Example: " + (markAsDone ? "mark" : "unmark") + " 2");
-            System.out.println("____________________________________________________________");
+        } catch (NumberFormatException e) {
+            throw new InvalidFormatException((markAsDone ? "mark" : "unmark") + " <task-number> (must be a number)");
         }
     }
 }
