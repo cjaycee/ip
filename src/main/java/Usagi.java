@@ -1,7 +1,13 @@
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 public class Usagi {
+    private static final String HORIZONTAL_LINE = "____________________________________________________________";
+
+    private static void printLine() {
+        System.out.println(HORIZONTAL_LINE);
+    }
 
     // Custom exception classes
     static class UsagiException extends Exception {
@@ -143,18 +149,19 @@ public class Usagi {
         ArrayList<Task> tasks = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("____________________________________________________________");
+        printLine();
         System.out.println("Hello! I'm Usagi, your friendly task manager!");
         System.out.println("What can I do for you?");
-        System.out.println("____________________________________________________________");
+        printLine();
 
-        String input;
-        while (true) {
+        boolean isRunning = true;
+
+        while (isRunning && scanner.hasNextLine()) {
             try {
-                input = scanner.nextLine().trim();
+                String input = scanner.nextLine().trim();
 
                 if (input.equalsIgnoreCase("bye")) {
-                    break;
+                    isRunning = false;
                 } else if (input.equalsIgnoreCase("list")) {
                     displayTaskList(tasks);
                 } else if (input.startsWith("mark ")) {
@@ -167,28 +174,33 @@ public class Usagi {
                     addDeadlineTask(tasks, input);
                 } else if (input.startsWith("event ")) {
                     addEventTask(tasks, input);
+                } else if (input.startsWith("delete ")) {
+                    deleteTask(tasks, input);
                 } else if (!input.isEmpty()) {
                     throw new InvalidCommandException();
                 }
             } catch (UsagiException e) {
                 printErrorMessage(e.getMessage());
+            } catch (NoSuchElementException e) {
+                // Handle end of input gracefully
+                isRunning = false;
             }
         }
 
-        System.out.println("____________________________________________________________");
+        printLine();
         System.out.println("Bye. Hope to see you again soon!");
-        System.out.println("____________________________________________________________");
+        printLine();
         scanner.close();
     }
 
     private static void printErrorMessage(String message) {
-        System.out.println("____________________________________________________________");
+        printLine();
         System.out.println("Oops! " + message);
-        System.out.println("____________________________________________________________");
+        printLine();
     }
 
     private static void displayTaskList(ArrayList<Task> tasks) {
-        System.out.println("____________________________________________________________");
+        printLine();
         if (tasks.isEmpty()) {
             System.out.println("Your list is empty! Add some tasks first.");
         } else {
@@ -197,7 +209,7 @@ public class Usagi {
                 System.out.println((i + 1) + "." + tasks.get(i).toString());
             }
         }
-        System.out.println("____________________________________________________________");
+        printLine();
     }
 
     private static void addTodoTask(ArrayList<Task> tasks, String input) throws UsagiException {
@@ -208,11 +220,11 @@ public class Usagi {
 
         Task newTask = new Todo(description);
         tasks.add(newTask);
-        System.out.println("____________________________________________________________");
+        printLine();
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + newTask.toString());
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        System.out.println("____________________________________________________________");
+        printLine();
     }
 
     private static void addDeadlineTask(ArrayList<Task> tasks, String input) throws UsagiException {
@@ -239,11 +251,11 @@ public class Usagi {
 
         Task newTask = new Deadline(description, by);
         tasks.add(newTask);
-        System.out.println("____________________________________________________________");
+        printLine();
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + newTask.toString());
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        System.out.println("____________________________________________________________");
+        printLine();
     }
 
     private static void addEventTask(ArrayList<Task> tasks, String input) throws UsagiException {
@@ -277,11 +289,11 @@ public class Usagi {
 
         Task newTask = new Event(description, from, to);
         tasks.add(newTask);
-        System.out.println("____________________________________________________________");
+        printLine();
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + newTask.toString());
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        System.out.println("____________________________________________________________");
+        printLine();
     }
 
     private static void handleMarkCommand(ArrayList<Task> tasks, String input, boolean markAsDone) throws UsagiException {
@@ -301,19 +313,44 @@ public class Usagi {
 
             if (markAsDone) {
                 task.markAsDone();
-                System.out.println("____________________________________________________________");
+                printLine();
                 System.out.println("Nice! I've marked this task as done:");
                 System.out.println("  " + task.toString());
-                System.out.println("____________________________________________________________");
+                printLine();
             } else {
                 task.markAsNotDone();
-                System.out.println("____________________________________________________________");
+                printLine();
                 System.out.println("OK, I've marked this task as not done yet:");
                 System.out.println("  " + task.toString());
-                System.out.println("____________________________________________________________");
+                printLine();
             }
         } catch (NumberFormatException e) {
             throw new InvalidFormatException((markAsDone ? "mark" : "unmark") + " <task-number> (must be a number)");
+        }
+    }
+
+    private static void deleteTask(ArrayList<Task> tasks, String input) throws UsagiException {
+        try {
+            String[] parts = input.split(" ", 2);
+            if (parts.length < 2) {
+                throw new InvalidFormatException("delete <task-number>");
+            }
+
+            int taskNumber = Integer.parseInt(parts[1]) - 1;
+
+            if (taskNumber < 0 || taskNumber >= tasks.size()) {
+                throw new InvalidTaskNumberException(tasks.size());
+            }
+
+            Task removedTask = tasks.remove(taskNumber);
+            printLine();
+            System.out.println("Noted. I've removed this task:");
+            System.out.println("  " + removedTask.toString());
+            System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+            printLine();
+
+        } catch (NumberFormatException e) {
+            throw new InvalidFormatException("delete <task-number> (must be a number)");
         }
     }
 }
