@@ -5,8 +5,8 @@ import java.util.NoSuchElementException;
 import java.io.File;
 import java.io.FileWriter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 
 public class Usagi {
     private static final String HORIZONTAL_LINE = "____________________________________________________________";
@@ -155,18 +155,26 @@ public class Usagi {
     // Event class
     static class Event extends Task {
         protected String start;
+        protected LocalDateTime startTime;
         protected String end;
+        protected LocalDateTime endTime;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d yyyy hh:mm:ss");
 
+        //start & end must be in the format 2015-02-20T06:30:00
         Event(String description, String start, String end) {
             super(description);
             this.start = start;
+            this.startTime = LocalDateTime.parse(start);
             this.end = end;
+            this.endTime = LocalDateTime.parse(end);
         }
 
         Event(String description, boolean isDone, String start, String end) {
             super(description, isDone);
             this.start = start;
+            this.startTime = LocalDateTime.parse(start);
             this.end = end;
+            this.endTime = LocalDateTime.parse(end);
         }
 
         @Override
@@ -176,7 +184,7 @@ public class Usagi {
 
         @Override
         String getFullDescription() {
-            return getTaskType() + super.toString() + " (from: " + start + " to: " + end + ")";
+            return getTaskType() + super.toString() + " (from: " + startTime.format(formatter) + " to: " + endTime.format(formatter) + ")";
         }
 
         @Override
