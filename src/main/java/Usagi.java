@@ -1,6 +1,9 @@
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+import java.io.File;
+import java.io.FileWriter;
 
 public class Usagi {
     private static final String HORIZONTAL_LINE = "____________________________________________________________";
@@ -28,6 +31,7 @@ public class Usagi {
         }
     }
 
+
     static class InvalidFormatException extends UsagiException {
         public InvalidFormatException(String correctFormat) {
             super("Please use the correct format: " + correctFormat);
@@ -50,6 +54,11 @@ public class Usagi {
             this.isDone = false;
         }
 
+        Task(String description, boolean isDone) {
+            this.description = description;
+            this.isDone = isDone;
+        }
+
         String getStatusIcon() {
             return isDone ? "[X]" : "[ ]";
         }
@@ -67,14 +76,18 @@ public class Usagi {
             return getStatusIcon() + " " + description;
         }
 
+        abstract String toFileString();
         abstract String getTaskType();
         abstract String getFullDescription();
     }
 
-    // Todo class
     static class Todo extends Task {
         Todo(String description) {
             super(description);
+        }
+
+        Todo(String description, boolean isDone) {
+            super(description, isDone);
         }
 
         @Override
@@ -91,42 +104,61 @@ public class Usagi {
         public String toString() {
             return getFullDescription();
         }
+
+        @Override
+        String toFileString() {
+            return "T | " + (isDone ? "1" : "0") + " | " + description;
+        }
     }
 
-    // Deadline class
     static class Deadline extends Task {
-        protected String by;
+        protected String dueDate;
 
-        Deadline(String description, String by) {
+        Deadline(String description, String dueDate) {
             super(description);
-            this.by = by;
+            this.dueDate = dueDate;
+        }
+
+        Deadline(String description, boolean isDone, String dueDate) {
+            super(description, isDone);
+            this.dueDate = dueDate;
         }
 
         @Override
         String getTaskType() {
-            return "[D]";
-        }
+            return "[D]";        }
 
         @Override
         String getFullDescription() {
-            return getTaskType() + super.toString() + " (by: " + by + ")";
+            return getTaskType() + super.toString() + " (by: " + dueDate + ")";
         }
 
         @Override
         public String toString() {
             return getFullDescription();
         }
+
+        @Override
+        String toFileString() {
+            return "D | " + (isDone ? "1" : "0") + " | " + description + " | " + dueDate;
+        }
     }
 
     // Event class
     static class Event extends Task {
-        protected String from;
-        protected String to;
+        protected String start;
+        protected String end;
 
-        Event(String description, String from, String to) {
+        Event(String description, String start, String end) {
             super(description);
-            this.from = from;
-            this.to = to;
+            this.start = start;
+            this.end = end;
+        }
+
+        Event(String description, boolean isDone, String start, String end) {
+            super(description, isDone);
+            this.start = start;
+            this.end = end;
         }
 
         @Override
@@ -136,12 +168,17 @@ public class Usagi {
 
         @Override
         String getFullDescription() {
-            return getTaskType() + super.toString() + " (from: " + from + " to: " + to + ")";
+            return getTaskType() + super.toString() + " (from: " + start + " to: " + end + ")";
         }
 
         @Override
         public String toString() {
             return getFullDescription();
+        }
+
+        @Override
+        String toFileString() {
+            return "E | " + (isDone ? "1" : "0") + " | " + description + " | " + start + " to " + end;
         }
     }
 
@@ -154,43 +191,55 @@ public class Usagi {
         System.out.println("What can I do for you?");
         printLine();
 
-        boolean isRunning = true;
+    boolean isRunning = true;
 
-        while (isRunning && scanner.hasNextLine()) {
-            try {
-                String input = scanner.nextLine().trim();
+    try {
+        tasks = readFileContent("data/Usagi.txt");
+    } catch (IOException e) {
+        System.out.println("Something went wrong while reading the file: " + e.getMessage());
+    }
 
-                if (input.equalsIgnoreCase("bye")) {
-                    isRunning = false;
-                } else if (input.equalsIgnoreCase("list")) {
-                    displayTaskList(tasks);
-                } else if (input.startsWith("mark ")) {
-                    handleMarkCommand(tasks, input, true);
-                } else if (input.startsWith("unmark ")) {
-                    handleMarkCommand(tasks, input, false);
-                } else if (input.startsWith("todo ")) {
-                    addTodoTask(tasks, input);
-                } else if (input.startsWith("deadline ")) {
-                    addDeadlineTask(tasks, input);
-                } else if (input.startsWith("event ")) {
-                    addEventTask(tasks, input);
-                } else if (input.startsWith("delete ")) {
-                    deleteTask(tasks, input);
-                } else if (!input.isEmpty()) {
-                    throw new InvalidCommandException();
-                }
-            } catch (UsagiException e) {
-                printErrorMessage(e.getMessage());
-            } catch (NoSuchElementException e) {
-                // Handle end of input gracefully
+    while (isRunning && scanner.hasNextLine()) {
+        try {
+            String input = scanner.nextLine().trim();
+
+            if (input.equalsIgnoreCase("bye")) {
                 isRunning = false;
+            } else if (input.equalsIgnoreCase("list")) {
+                displayTaskList(tasks);
+            } else if (input.startsWith("mark ")) {
+                handleMarkCommand(tasks, input, true);
+            } else if (input.startsWith("unmark ")) {
+                handleMarkCommand(tasks, input, false);
+            } else if (input.startsWith("todo ")) {
+                addTodoTask(tasks, input);
+            } else if (input.startsWith("deadline ")) {
+                addDeadlineTask(tasks, input);
+            } else if (input.startsWith("event ")) {
+                addEventTask(tasks, input);
+            } else if (input.startsWith("delete ")) {
+                deleteTask(tasks, input);
+            } else if (!input.isEmpty()) {
+                throw new InvalidCommandException();
             }
+        } catch (UsagiException e) {
+            printErrorMessage(e.getMessage());
+        } catch (NoSuchElementException e) {
+            // Handle end of input gracefully
+            isRunning = false;
         }
+    }
 
         printLine();
         System.out.println("Bye. Hope to see you again soon!");
         printLine();
         scanner.close();
+
+        try {
+            writeFileContent(tasks, "data/Usagi.txt");
+        } catch (IOException e) {
+            System.out.println("Something went wrong while reading the file: " + e.getMessage());
+        }
     }
 
     private static void printErrorMessage(String message) {
@@ -240,16 +289,16 @@ public class Usagi {
         }
 
         String description = parts[0].trim();
-        String by = parts[1].trim();
+        String dueDate = parts[1].trim();
 
         if (description.isEmpty()) {
             throw new EmptyDescriptionException("deadline");
         }
-        if (by.isEmpty()) {
+        if (dueDate.isEmpty()) {
             throw new InvalidFormatException("deadline <description> /by <time> (time cannot be empty)");
         }
 
-        Task newTask = new Deadline(description, by);
+        Task newTask = new Deadline(description, dueDate);
         tasks.add(newTask);
         printLine();
         System.out.println("Got it. I've added this task:");
@@ -353,4 +402,68 @@ public class Usagi {
             throw new InvalidFormatException("delete <task-number> (must be a number)");
         }
     }
+
+    private static ArrayList<Task> readFileContent(String filePath) throws IOException {
+        ArrayList<Task> tasks = new ArrayList<>();
+
+        File f = new File(filePath);
+        File folder = f.getParentFile();
+
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+
+        if (!f.exists()) {
+            f.createNewFile();
+            return tasks; // empty list on first run
+        }
+
+        Scanner s = new Scanner(f);
+        while (s.hasNextLine()) {
+            String line = s.nextLine().trim();
+            if (line.isEmpty()) continue;
+
+            String[] parts = line.split("\\|");
+            for (int i = 0; i < parts.length; i++) {
+                parts[i] = parts[i].trim();
+            }
+
+            String type = parts[0]; // T, D, or E
+            boolean isDone = parts[1].equals("1");
+            String desc = parts[2];
+
+            Task t = null;
+
+            switch (type) {
+            case "T":
+                t = new Todo(desc);
+                break;
+            case "D":
+                t = new Deadline(desc, parts[3]);
+                break;
+            case "E":
+                String[] times = parts[3].split(" to ", 2);
+                t = new Event(desc, times[0], times[1]);
+                break;
+            }
+
+            if (isDone && t != null) {
+                t.markAsDone();
+            }
+            if (t != null) {
+                tasks.add(t);
+            }
+        }
+        s.close();
+        return tasks;
+    }
+
+    private static void writeFileContent(ArrayList<Task> tasks, String filePath) throws IOException {
+        FileWriter fw = new FileWriter(filePath);
+        for (Task t : tasks) {
+            fw.write(t.toFileString() + System.lineSeparator());
+        }
+        fw.close();
+    }
+
 }
