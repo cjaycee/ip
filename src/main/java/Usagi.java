@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 
 public class Usagi {
     private static final String HORIZONTAL_LINE = "____________________________________________________________";
-
     private static void printLine() {
         System.out.println(HORIZONTAL_LINE);
     }
