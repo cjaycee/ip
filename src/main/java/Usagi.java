@@ -1,9 +1,13 @@
 import java.io.IOException;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.io.File;
 import java.io.FileWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Usagi {
     private static final String HORIZONTAL_LINE = "____________________________________________________________";
@@ -112,73 +116,93 @@ public class Usagi {
     }
 
     static class Deadline extends Task {
-        protected String dueDate;
+        private static final DateTimeFormatter IO_FMT = DateTimeFormatter.ISO_LOCAL_DATE;      // e.g., 2025-08-29
+        private static final DateTimeFormatter VIEW_FMT = DateTimeFormatter.ofPattern("MMM d yyyy"); // e.g., Aug 29 2025
 
+        private final LocalDate due;
+
+        // dueDate must be ISO: yyyy-MM-dd
         Deadline(String description, String dueDate) {
             super(description);
-            this.dueDate = dueDate;
+            this.due = parseDue(dueDate);
         }
 
         Deadline(String description, boolean isDone, String dueDate) {
             super(description, isDone);
-            this.dueDate = dueDate;
+            this.due = parseDue(dueDate);
         }
 
-        @Override
-        String getTaskType() {
-            return "[D]";        }
-
-        @Override
-        String getFullDescription() {
-            return getTaskType() + super.toString() + " (by: " + dueDate + ")";
+        private static LocalDate parseDue(String s) {
+            try {
+                return LocalDate.parse(s, IO_FMT);
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Invalid deadline date '" + s + "'. Expected yyyy-MM-dd.", e);
+            }
         }
 
-        @Override
-        public String toString() {
-            return getFullDescription();
+        @Override String getTaskType() { return "[D]"; }
+
+        @Override String getFullDescription() {
+            return getTaskType() + super.toString() + " (by: " + due.format(VIEW_FMT) + ")";
         }
 
-        @Override
-        String toFileString() {
-            return "D | " + (isDone ? "1" : "0") + " | " + description + " | " + dueDate;
+        @Override public String toString() { return getFullDescription(); }
+
+        @Override String toFileString() {
+            return "D | " + (isDone ? "1" : "0") + " | " + description + " | " + due.format(IO_FMT);
         }
     }
 
     // Event class
     static class Event extends Task {
-        protected String start;
-        protected String end;
+        private static final DateTimeFormatter IO_FMT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;       // e.g., 2015-02-20T06:30
+        private static final DateTimeFormatter VIEW_FMT = DateTimeFormatter.ofPattern("MMM d yyyy HH:mm");
 
+        private final LocalDateTime start;
+        private final LocalDateTime end;
+
+        // start/end must be ISO: yyyy-MM-dd'T'HH:mm[:ss]
         Event(String description, String start, String end) {
             super(description);
-            this.start = start;
-            this.end = end;
+            this.start = parseDateTime(start);
+            this.end = parseDateTime(end);
+            validateOrder();
         }
 
         Event(String description, boolean isDone, String start, String end) {
             super(description, isDone);
-            this.start = start;
-            this.end = end;
+            this.start = parseDateTime(start);
+            this.end = parseDateTime(end);
+            validateOrder();
         }
 
-        @Override
-        String getTaskType() {
-            return "[E]";
+        private static LocalDateTime parseDateTime(String s) {
+            try {
+                return LocalDateTime.parse(s, IO_FMT); // accepts both with & without seconds
+            } catch (DateTimeParseException ex) {
+                throw new IllegalArgumentException(
+                        "Invalid event datetime '" + s + "'. Expected ISO, e.g., 2015-02-20T06:30.", ex);
+            }
         }
 
-        @Override
-        String getFullDescription() {
-            return getTaskType() + super.toString() + " (from: " + start + " to: " + end + ")";
+        private void validateOrder() {
+            if (end.isBefore(start)) {
+                throw new IllegalArgumentException("Event end time cannot be before start time.");
+            }
         }
 
-        @Override
-        public String toString() {
-            return getFullDescription();
+        @Override String getTaskType() { return "[E]"; }
+
+        @Override String getFullDescription() {
+            return getTaskType() + super.toString()
+                    + " (from: " + start.format(VIEW_FMT) + " to: " + end.format(VIEW_FMT) + ")";
         }
 
-        @Override
-        String toFileString() {
-            return "E | " + (isDone ? "1" : "0") + " | " + description + " | " + start + " to " + end;
+        @Override public String toString() { return getFullDescription(); }
+
+        @Override String toFileString() {
+            return "E | " + (isDone ? "1" : "0") + " | " + description + " | "
+                    + start.format(IO_FMT) + " | " + end.format(IO_FMT);
         }
     }
 
@@ -442,8 +466,7 @@ public class Usagi {
                 t = new Deadline(desc, parts[3]);
                 break;
             case "E":
-                String[] times = parts[3].split(" to ", 2);
-                t = new Event(desc, times[0], times[1]);
+                t = new Event(desc, parts[3], parts[4]);
                 break;
             }
 
