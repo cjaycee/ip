@@ -24,10 +24,24 @@ Here are the tasks in your list:
 3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
 ____________________________________________________________
 ____________________________________________________________
-Oops! I'm sorry, but I don't know what that means. Please try again!
+Nice! I've marked this task as done:
+  [D][X] return book (by: Sunday)
 ____________________________________________________________
 ____________________________________________________________
-Oops! I'm sorry, but I don't know what that means. Please try again!
+Here are the tasks in your list:
+1.[T][ ] borrow book
+2.[D][X] return book (by: Sunday)
+3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+____________________________________________________________
+____________________________________________________________
+OK, I've marked this task as not done yet:
+  [D][ ] return book (by: Sunday)
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] borrow book
+2.[D][ ] return book (by: Sunday)
+3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!

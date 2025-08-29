@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.io.File;
 import java.io.FileWriter;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 public class Usagi {
     private static final String HORIZONTAL_LINE = "____________________________________________________________";
@@ -113,15 +116,20 @@ public class Usagi {
 
     static class Deadline extends Task {
         protected String dueDate;
+        protected LocalDate date;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d yyyy");
 
+        //dueDate should be in the format: yyyy-mm-dd
         Deadline(String description, String dueDate) {
             super(description);
             this.dueDate = dueDate;
+            this.date = LocalDate.parse(dueDate);
         }
 
         Deadline(String description, boolean isDone, String dueDate) {
             super(description, isDone);
             this.dueDate = dueDate;
+            this.date = LocalDate.parse(dueDate);
         }
 
         @Override
@@ -130,7 +138,7 @@ public class Usagi {
 
         @Override
         String getFullDescription() {
-            return getTaskType() + super.toString() + " (by: " + dueDate + ")";
+            return getTaskType() + super.toString() + " (by: " + date.format(formatter) + ")";
         }
 
         @Override
