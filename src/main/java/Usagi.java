@@ -6,38 +6,6 @@ import java.io.FileWriter;
 
 public class Usagi {
 
-    // Custom exception classes
-    static class UsagiException extends Exception {
-        public UsagiException(String message) {
-            super(message);
-        }
-    }
-
-    static class EmptyDescriptionException extends UsagiException {
-        public EmptyDescriptionException(String taskType) {
-            super("The description of a " + taskType + " cannot be empty.");
-        }
-    }
-
-    static class InvalidCommandException extends UsagiException {
-        public InvalidCommandException() {
-            super("I'm sorry, but I don't know what that means. Please try again!");
-        }
-    }
-
-
-    static class InvalidFormatException extends UsagiException {
-        public InvalidFormatException(String correctFormat) {
-            super("Please use the correct format: " + correctFormat);
-        }
-    }
-
-    static class InvalidTaskNumberException extends UsagiException {
-        public InvalidTaskNumberException(int maxTasks) {
-            super("Please enter a valid task number between 1 and " + maxTasks);
-        }
-    }
-
     public static void main(String[] args) {
         TaskList tasks = new TaskList();
         Ui ui = new Ui();
