@@ -1,3 +1,0 @@
-T | 0 | borrow book
-D | 0 | return book | 2025-08-31
-E | 0 | project meeting | Mon 2pm to 4pm
