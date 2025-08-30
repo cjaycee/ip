@@ -1,23 +1,24 @@
 import java.io.IOException;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.io.File;
-import java.io.FileWriter;
 
 public class Usagi {
 
-    public static void main(String[] args) {
-        TaskList tasks = new TaskList();
-        Ui ui = new Ui();
-        Storage storage = new Storage("data/Usagi.txt");
+    private Storage storage;
+    private TaskList tasks;
+    private Ui ui;
 
-        ui.greet();
-
+    public Usagi(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
         try {
-            tasks = storage.readFileContent();
+            tasks = new TaskList(storage.load().displayTasks());
         } catch (IOException e) {
-            System.out.println("Something went wrong while reading the file: " + e.getMessage());
+            ui.printErrorMessage(e.getMessage());
+            tasks = new TaskList();
         }
+    }
+
+    public void run() {
+        ui.greet();
 
         while (ui.hasNextLine()) {
             try {
@@ -31,10 +32,14 @@ public class Usagi {
         ui.closeScanner();
 
         try {
-            storage.writeFileContent(tasks);
+            storage.save(tasks);
         } catch (IOException e) {
             System.out.println("Something went wrong while reading the file: " + e.getMessage());
         }
+    }
+
+    public static void main(String[] args) {
+        new Usagi("data/tasks.txt").run();
     }
 
 }

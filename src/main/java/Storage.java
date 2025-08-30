@@ -11,7 +11,7 @@ public class Storage {
         this.filePath = filepath;
     }
 
-    public TaskList readFileContent() throws IOException {
+    public TaskList load() throws IOException {
         TaskList tasks = new TaskList();
 
         File f = new File(this.filePath);
@@ -65,7 +65,7 @@ public class Storage {
         return tasks;
     }
 
-    public void writeFileContent(TaskList tasks) throws IOException {
+    public void save(TaskList tasks) throws IOException {
         FileWriter fw = new FileWriter(this.filePath);
         for (int i = 0; i < tasks.size(); i++) {
             fw.write(tasks.get(i).toFileString() + System.lineSeparator());
