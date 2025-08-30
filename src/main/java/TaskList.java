@@ -24,6 +24,16 @@ public class TaskList {
         this.tasks = tasks != null ? tasks : new ArrayList<>();
     }
 
+
+    /**
+     * Returns boolean of whether task list is empty
+     *
+     * @return Whether task list is empty
+     */
+    public boolean isEmpty() {
+        return this.size() == 0;
+    }
+
     /**
      * Returns the number of tasks in the list.
      *
