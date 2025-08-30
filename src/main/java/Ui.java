@@ -5,11 +5,9 @@ public class Ui {
     private final String NAME = "Usagi";
     private final String HORIZONTAL_LINE = "____________________________________________________________";
     private Scanner scanner;
-    boolean isRunning;
 
     public Ui() {
         this.scanner = new Scanner(System.in);
-        this.isRunning = true;
     }
 
     public void printLine() {
@@ -32,11 +30,15 @@ public class Ui {
     }
 
     public void endConvo() {
-        this.scanner.close();
         this.printLine();
         System.out.println("Bye. Hope to see you again soon!");
         this.printLine();
     }
+
+    public void closeScanner() {
+        this.scanner.close();
+    }
+
     public void printErrorMessage(String message) {
         this.printLine();
         System.out.println("Oops! " + message);
