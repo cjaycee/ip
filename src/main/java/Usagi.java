@@ -6,10 +6,6 @@ import java.io.File;
 import java.io.FileWriter;
 
 public class Usagi {
-    private static final String HORIZONTAL_LINE = "____________________________________________________________";
-    private static void printLine() {
-        System.out.println(HORIZONTAL_LINE);
-    }
 
     // Custom exception classes
     static class UsagiException extends Exception {
@@ -45,56 +41,49 @@ public class Usagi {
 
     public static void main(String[] args) {
         TaskList tasks = new TaskList();
-        Scanner scanner = new Scanner(System.in);
+        Ui ui = new Ui();
+        boolean isRunning = true;
 
-        printLine();
-        System.out.println("Hello! I'm Usagi, your friendly task manager!");
-        System.out.println("What can I do for you?");
-        printLine();
+        ui.greet();
 
-    boolean isRunning = true;
-
-    try {
-        tasks = readFileContent("data/Usagi.txt");
-    } catch (IOException e) {
-        System.out.println("Something went wrong while reading the file: " + e.getMessage());
-    }
-
-    while (isRunning && scanner.hasNextLine()) {
         try {
-            String input = scanner.nextLine().trim();
-
-            if (input.equalsIgnoreCase("bye")) {
-                isRunning = false;
-            } else if (input.equalsIgnoreCase("list")) {
-                displayTaskList(tasks);
-            } else if (input.startsWith("mark ")) {
-                handleMarkCommand(tasks, input, true);
-            } else if (input.startsWith("unmark ")) {
-                handleMarkCommand(tasks, input, false);
-            } else if (input.startsWith("todo ")) {
-                addTodoTask(tasks, input);
-            } else if (input.startsWith("deadline ")) {
-                addDeadlineTask(tasks, input);
-            } else if (input.startsWith("event ")) {
-                addEventTask(tasks, input);
-            } else if (input.startsWith("delete ")) {
-                deleteTask(tasks, input);
-            } else if (!input.isEmpty()) {
-                throw new InvalidCommandException();
-            }
-        } catch (UsagiException e) {
-            printErrorMessage(e.getMessage());
-        } catch (NoSuchElementException e) {
-            // Handle end of input gracefully
-            isRunning = false;
+            tasks = readFileContent("data/Usagi.txt");
+        } catch (IOException e) {
+            System.out.println("Something went wrong while reading the file: " + e.getMessage());
         }
-    }
 
-        printLine();
-        System.out.println("Bye. Hope to see you again soon!");
-        printLine();
-        scanner.close();
+        while (isRunning && ui.hasNextLine()) {
+            try {
+                String input = ui.readCommand().trim();
+
+                if (input.equalsIgnoreCase("bye")) {
+                    isRunning = false;
+                } else if (input.equalsIgnoreCase("list")) {
+                    ui.displayTaskList(tasks);
+                } else if (input.startsWith("mark ")) {
+                    handleMarkCommand(ui, tasks, input, true);
+                } else if (input.startsWith("unmark ")) {
+                    handleMarkCommand(ui, tasks, input, false);
+                } else if (input.startsWith("todo ")) {
+                    addTodoTask(ui, tasks, input);
+                } else if (input.startsWith("deadline ")) {
+                    addDeadlineTask(ui, tasks, input);
+                } else if (input.startsWith("event ")) {
+                    addEventTask(ui, tasks, input);
+                } else if (input.startsWith("delete ")) {
+                    deleteTask(ui, tasks, input);
+                } else if (!input.isEmpty()) {
+                    throw new InvalidCommandException();
+                }
+            } catch (UsagiException e) {
+                ui.printErrorMessage(e.getMessage());
+            } catch (NoSuchElementException e) {
+                // Handle end of input gracefully
+                isRunning = false;
+            }
+        }
+
+        ui.endConvo();
 
         try {
             writeFileContent(tasks, "data/Usagi.txt");
@@ -103,41 +92,18 @@ public class Usagi {
         }
     }
 
-    private static void printErrorMessage(String message) {
-        printLine();
-        System.out.println("Oops! " + message);
-        printLine();
-    }
-
-    private static void displayTaskList(TaskList tasks) {
-        printLine();
-        if (tasks.isEmpty()) {
-            System.out.println("Your list is empty! Add some tasks first.");
-        } else {
-            System.out.println("Here are the tasks in your list:");
-            for (int i = 0; i < tasks.size(); i++) {
-                System.out.println((i + 1) + "." + tasks.get(i).toString());
-            }
-        }
-        printLine();
-    }
-
-    private static void addTodoTask(TaskList tasks, String input) throws UsagiException {
+    private static void addTodoTask(Ui ui, TaskList tasks, String input) throws UsagiException {
         String description = input.substring(5).trim();
         if (description.isEmpty()) {
             throw new EmptyDescriptionException("todo");
         }
 
-        Task newTask = new Todo(description);
-        tasks.add(newTask);
-        printLine();
-        System.out.println("Got it. I've added this task:");
-        System.out.println("  " + newTask.toString());
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        printLine();
+        Task t = new Todo(description);
+        tasks.add(t);
+        ui.displayTaskAdded(tasks, t);
     }
 
-    private static void addDeadlineTask(TaskList tasks, String input) throws UsagiException {
+    private static void addDeadlineTask(Ui ui, TaskList tasks, String input) throws UsagiException {
         String withoutPrefix = input.substring(9).trim();
         if (withoutPrefix.isEmpty()) {
             throw new EmptyDescriptionException("deadline");
@@ -159,16 +125,12 @@ public class Usagi {
             throw new InvalidFormatException("deadline <description> /by <time> (time cannot be empty)");
         }
 
-        Task newTask = new Deadline(description, dueDate);
-        tasks.add(newTask);
-        printLine();
-        System.out.println("Got it. I've added this task:");
-        System.out.println("  " + newTask.toString());
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        printLine();
+        Task t = new Deadline(description, dueDate);
+        tasks.add(t);
+        ui.displayTaskAdded(tasks, t);
     }
 
-    private static void addEventTask(TaskList tasks, String input) throws UsagiException {
+    private static void addEventTask(Ui ui, TaskList tasks, String input) throws UsagiException {
         String withoutPrefix = input.substring(6).trim();
         if (withoutPrefix.isEmpty()) {
             throw new EmptyDescriptionException("event");
@@ -197,16 +159,12 @@ public class Usagi {
             throw new InvalidFormatException("event <description> /from <start> /to <end> (times cannot be empty)");
         }
 
-        Task newTask = new Event(description, from, to);
-        tasks.add(newTask);
-        printLine();
-        System.out.println("Got it. I've added this task:");
-        System.out.println("  " + newTask.toString());
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        printLine();
+        Task t = new Event(description, from, to);
+        tasks.add(t);
+        ui.displayTaskAdded(tasks, t);
     }
 
-    private static void handleMarkCommand(TaskList tasks, String input, boolean markAsDone) throws UsagiException {
+    private static void handleMarkCommand(Ui ui, TaskList tasks, String input, boolean markAsDone) throws UsagiException {
         try {
             String[] parts = input.split(" ", 2);
             if (parts.length < 2) {
@@ -219,27 +177,21 @@ public class Usagi {
                 throw new InvalidTaskNumberException(tasks.size());
             }
 
-            Task task = tasks.get(taskNumber);
+            Task t = tasks.get(taskNumber);
 
             if (markAsDone) {
-                task.markAsDone();
-                printLine();
-                System.out.println("Nice! I've marked this task as done:");
-                System.out.println("  " + task.toString());
-                printLine();
+                t.markAsDone();
+                ui.displayMarked(t);
             } else {
-                task.markAsNotDone();
-                printLine();
-                System.out.println("OK, I've marked this task as not done yet:");
-                System.out.println("  " + task.toString());
-                printLine();
+                t.markAsNotDone();
+                ui.displayUnmarked(t);
             }
         } catch (NumberFormatException e) {
             throw new InvalidFormatException((markAsDone ? "mark" : "unmark") + " <task-number> (must be a number)");
         }
     }
 
-    private static void deleteTask(TaskList tasks, String input) throws UsagiException {
+    private static void deleteTask(Ui ui, TaskList tasks, String input) throws UsagiException {
         try {
             String[] parts = input.split(" ", 2);
             if (parts.length < 2) {
@@ -252,12 +204,8 @@ public class Usagi {
                 throw new InvalidTaskNumberException(tasks.size());
             }
 
-            Task removedTask = tasks.remove(taskNumber);
-            printLine();
-            System.out.println("Noted. I've removed this task:");
-            System.out.println("  " + removedTask.toString());
-            System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-            printLine();
+            Task t = tasks.remove(taskNumber);
+            ui.displayTaskDeleted(tasks, t);
 
         } catch (NumberFormatException e) {
             throw new InvalidFormatException("delete <task-number> (must be a number)");
