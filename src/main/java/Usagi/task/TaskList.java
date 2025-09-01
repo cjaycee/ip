@@ -1,3 +1,4 @@
+package Usagi.task;
 
 import java.util.ArrayList;
 
@@ -47,7 +48,7 @@ public class TaskList {
      * Returns the task at the specified index.
      *
      * @param idx Index of the task to return.
-     * @return Task at the given index.
+     * @return Usagi.task.Task at the given index.
      */
     public Task get(int idx) {
         return tasks.get(idx);
@@ -56,7 +57,7 @@ public class TaskList {
     /**
      * Adds a task to the list.
      *
-     * @param t Task to be added.
+     * @param t Usagi.task.Task to be added.
      */
     public void add(Task t) {
         tasks.add(t);

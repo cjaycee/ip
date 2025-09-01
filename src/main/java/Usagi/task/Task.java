@@ -1,3 +1,5 @@
+package Usagi.task;
+
 /**
  * Represents a generic task with a description and completion status.
  */
@@ -45,7 +47,7 @@ public abstract class Task {
     /**
      * Returns a string suitable for saving to file.
      */
-    abstract String toFileString();
+    public abstract String toFileString();
 
     /**
      * Returns the task type label, e.g., [T], [D], [E].

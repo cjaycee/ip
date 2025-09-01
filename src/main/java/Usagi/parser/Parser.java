@@ -1,3 +1,13 @@
+package Usagi.parser;
+
+import Usagi.ui.Ui;
+import Usagi.exception.*;
+import Usagi.task.Task;
+import Usagi.task.Todo;
+import Usagi.task.Deadline;
+import Usagi.task.Event;
+import Usagi.task.TaskList;
+
 public class Parser {
 
     public static void interpretCommand(String input, Ui ui, TaskList tasks) throws UsagiException {

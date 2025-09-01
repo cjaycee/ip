@@ -1,9 +1,11 @@
+package Usagi.task;
+
 /**
- * Represents a Todo task
+ * Represents a Usagi.task.Todo task
  */
 public class Todo extends Task {
 
-    Todo(String description) {
+    public Todo(String description) {
         super(description);
     }
 
@@ -27,7 +29,7 @@ public class Todo extends Task {
     }
 
     @Override
-    String toFileString() {
+    public String toFileString() {
         return "T | " + (isDone ? "1" : "0") + " | " + description;
     }
 
