@@ -19,7 +19,7 @@ public class Todo extends Task {
     }
 
     @Override
-    String getFullDescription() {
+    public String getFullDescription() {
         return getTaskType() + super.toString();
     }
 

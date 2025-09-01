@@ -1,15 +1,32 @@
 package Usagi.parser;
 
-import Usagi.ui.Ui;
-import Usagi.exception.*;
-import Usagi.task.Task;
-import Usagi.task.Todo;
+import Usagi.exception.EmptyDescriptionException;
+import Usagi.exception.InvalidCommandException;
+import Usagi.exception.InvalidFormatException;
+import Usagi.exception.InvalidTaskNumberException;
+import Usagi.exception.UsagiException;
 import Usagi.task.Deadline;
 import Usagi.task.Event;
+import Usagi.task.Task;
 import Usagi.task.TaskList;
+import Usagi.task.Todo;
+import Usagi.ui.Ui;
 
+/**
+ * Parses user input commands and executes corresponding operations on tasks.
+ * Handles various command types including task creation, marking, deletion, and listing.
+ */
 public class Parser {
 
+    /**
+     * Interprets and executes the given user command.
+     * Supports commands: bye, list, mark, unmark, todo, deadline, event, delete.
+     *
+     * @param input User input command string.
+     * @param ui User interface for displaying messages.
+     * @param tasks Task list to operate on.
+     * @throws UsagiException If the command is invalid or malformed.
+     */
     public static void interpretCommand(String input, Ui ui, TaskList tasks) throws UsagiException {
         if (input.equalsIgnoreCase("bye")) {
             ui.endConvo();
@@ -32,17 +49,33 @@ public class Parser {
         }
     }
 
+    /**
+     * Creates and adds a Todo task from the given input command.
+     *
+     * @param ui User interface for displaying messages.
+     * @param tasks Task list to add the task to.
+     * @param input Command string in format "todo <description>".
+     * @throws UsagiException If the description is empty.
+     */
     private static void addTodoTask(Ui ui, TaskList tasks, String input) throws UsagiException {
         String description = input.substring(5).trim();
         if (description.isEmpty()) {
             throw new EmptyDescriptionException("todo");
         }
 
-        Task t = new Todo(description);
-        tasks.add(t);
-        ui.displayTaskAdded(tasks, t);
+        Task task = new Todo(description);
+        tasks.add(task);
+        ui.displayTaskAdded(tasks, task);
     }
 
+    /**
+     * Creates and adds a Deadline task from the given input command.
+     *
+     * @param ui User interface for displaying messages.
+     * @param tasks Task list to add the task to.
+     * @param input Command string in format "deadline <description> /by <time>".
+     * @throws UsagiException If the format is invalid or description/time is empty.
+     */
     private static void addDeadlineTask(Ui ui, TaskList tasks, String input) throws UsagiException {
         String withoutPrefix = input.substring(9).trim();
         if (withoutPrefix.isEmpty()) {
@@ -65,11 +98,19 @@ public class Parser {
             throw new InvalidFormatException("deadline <description> /by <time> (time cannot be empty)");
         }
 
-        Task t = new Deadline(description, dueDate);
-        tasks.add(t);
-        ui.displayTaskAdded(tasks, t);
+        Task task = new Deadline(description, dueDate);
+        tasks.add(task);
+        ui.displayTaskAdded(tasks, task);
     }
 
+    /**
+     * Creates and adds an Event task from the given input command.
+     *
+     * @param ui User interface for displaying messages.
+     * @param tasks Task list to add the task to.
+     * @param input Command string in format "event <description> /from <start> /to <end>".
+     * @throws UsagiException If the format is invalid or any field is empty.
+     */
     private static void addEventTask(Ui ui, TaskList tasks, String input) throws UsagiException {
         String withoutPrefix = input.substring(6).trim();
         if (withoutPrefix.isEmpty()) {
@@ -99,12 +140,22 @@ public class Parser {
             throw new InvalidFormatException("event <description> /from <start> /to <end> (times cannot be empty)");
         }
 
-        Task t = new Event(description, from, to);
-        tasks.add(t);
-        ui.displayTaskAdded(tasks, t);
+        Task task = new Event(description, from, to);
+        tasks.add(task);
+        ui.displayTaskAdded(tasks, task);
     }
 
-    private static void handleMarkCommand(Ui ui, TaskList tasks, String input, boolean markAsDone) throws UsagiException {
+    /**
+     * Handles mark and unmark commands for tasks.
+     *
+     * @param ui User interface for displaying messages.
+     * @param tasks Task list containing the task to mark/unmark.
+     * @param input Command string in format "mark/unmark <task-number>".
+     * @param markAsDone True to mark as done, false to mark as not done.
+     * @throws UsagiException If the format is invalid or task number is out of range.
+     */
+    private static void handleMarkCommand(Ui ui, TaskList tasks, String input, boolean markAsDone)
+            throws UsagiException {
         try {
             String[] parts = input.split(" ", 2);
             if (parts.length < 2) {
@@ -117,20 +168,29 @@ public class Parser {
                 throw new InvalidTaskNumberException(tasks.size());
             }
 
-            Task t = tasks.get(taskNumber);
+            Task task = tasks.get(taskNumber);
 
             if (markAsDone) {
-                t.markAsDone();
-                ui.displayMarked(t);
+                task.markAsDone();
+                ui.displayMarked(task);
             } else {
-                t.markAsNotDone();
-                ui.displayUnmarked(t);
+                task.markAsNotDone();
+                ui.displayUnmarked(task);
             }
         } catch (NumberFormatException e) {
-            throw new InvalidFormatException((markAsDone ? "mark" : "unmark") + " <task-number> (must be a number)");
+            throw new InvalidFormatException((markAsDone ? "mark" : "unmark")
+                    + " <task-number> (must be a number)");
         }
     }
 
+    /**
+     * Deletes a task from the task list based on the given command.
+     *
+     * @param ui User interface for displaying messages.
+     * @param tasks Task list to remove the task from.
+     * @param input Command string in format "delete <task-number>".
+     * @throws UsagiException If the format is invalid or task number is out of range.
+     */
     private static void deleteTask(Ui ui, TaskList tasks, String input) throws UsagiException {
         try {
             String[] parts = input.split(" ", 2);
@@ -144,12 +204,11 @@ public class Parser {
                 throw new InvalidTaskNumberException(tasks.size());
             }
 
-            Task t = tasks.remove(taskNumber);
-            ui.displayTaskDeleted(tasks, t);
+            Task task = tasks.remove(taskNumber);
+            ui.displayTaskDeleted(tasks, task);
 
         } catch (NumberFormatException e) {
             throw new InvalidFormatException("delete <task-number> (must be a number)");
         }
     }
-
 }

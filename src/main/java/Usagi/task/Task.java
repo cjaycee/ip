@@ -57,6 +57,6 @@ public abstract class Task {
     /**
      * Returns a human-readable full description of the task.
      */
-    abstract String getFullDescription();
+    public abstract String getFullDescription();
 
 }

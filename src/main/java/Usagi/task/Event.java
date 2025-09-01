@@ -64,7 +64,8 @@ public class Event extends Task {
         return "[E]";
     }
 
-    @Override String getFullDescription() {
+    @Override
+    public String getFullDescription() {
         return getTaskType() + super.toString()
                 + " (from: " + start.format(VIEW_FMT) + " to: " + end.format(VIEW_FMT) + ")";
     }

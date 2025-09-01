@@ -8,12 +8,23 @@ import Usagi.ui.Ui;
 
 import java.io.IOException;
 
+/**
+ * Main application class for the Usagi task management system.
+ * Handles initialization, user interaction loop, and data persistence.
+ */
 public class Usagi {
 
     private Storage storage;
     private TaskList tasks;
     private Ui ui;
 
+    /**
+     * Creates a new Usagi application instance with the specified file path for data storage.
+     * Initializes the UI, storage, and attempts to load existing tasks from the file.
+     * If loading fails, starts with an empty task list.
+     *
+     * @param filePath Path to the file where tasks will be stored and loaded from.
+     */
     public Usagi(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
@@ -25,6 +36,11 @@ public class Usagi {
         }
     }
 
+    /**
+     * Starts the main application loop.
+     * Displays greeting, processes user commands until termination,
+     * and saves tasks to storage before exiting.
+     */
     public void run() {
         ui.greet();
 
@@ -46,8 +62,13 @@ public class Usagi {
         }
     }
 
+    /**
+     * Entry point for the Usagi application.
+     * Creates and runs a new Usagi instance with default data file path.
+     *
+     * @param args Command line arguments (not used).
+     */
     public static void main(String[] args) {
         new Usagi("data/tasks.txt").run();
     }
-
 }
