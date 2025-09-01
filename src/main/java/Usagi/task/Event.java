@@ -1,9 +1,11 @@
+package Usagi.task;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 /**
- * Represents an Event task with a start and end time
+ * Represents an Usagi.task.Event task with a start and end time
  * Start/end must be in the format: yyyy-MM-dd'T'HH:mm[:ss]
  */
 public class Event extends Task {
@@ -14,14 +16,14 @@ public class Event extends Task {
     private final LocalDateTime end;
 
     // start/end must be ISO: yyyy-MM-dd'T'HH:mm[:ss]
-    Event(String description, String start, String end) {
+    public Event(String description, String start, String end) {
         super(description);
         this.start = parseDateTime(start);
         this.end = parseDateTime(end);
         validateOrder();
     }
 
-    Event(String description, boolean isDone, String start, String end) {
+    public Event(String description, boolean isDone, String start, String end) {
         super(description, isDone);
         this.start = parseDateTime(start);
         this.end = parseDateTime(end);
@@ -53,7 +55,7 @@ public class Event extends Task {
      */
     private void validateOrder() {
         if (end.isBefore(start)) {
-            throw new IllegalArgumentException("Event end time cannot be before start time.");
+            throw new IllegalArgumentException("Usagi.task.Event end time cannot be before start time.");
         }
     }
 
@@ -71,7 +73,8 @@ public class Event extends Task {
         return getFullDescription();
     }
 
-    @Override String toFileString() {
+    @Override
+    public String toFileString() {
         return "E | " + (isDone ? "1" : "0") + " | " + description + " | "
                 + start.format(IO_FMT) + " | " + end.format(IO_FMT);
     }

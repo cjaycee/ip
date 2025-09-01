@@ -1,3 +1,8 @@
+package Usagi.ui;
+
+import Usagi.task.Task;
+import Usagi.task.TaskList;
+
 import java.util.Scanner;
 
 public class Ui {

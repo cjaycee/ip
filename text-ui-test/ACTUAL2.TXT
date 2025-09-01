@@ -1,5 +1,5 @@
 ____________________________________________________________
-Hello! I'm Usagi, your friendly task manager!
+Hello! I'm Usagi.app.Usagi, your friendly task manager!
 What can I do for you?
 ____________________________________________________________
 ____________________________________________________________
