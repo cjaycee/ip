@@ -49,7 +49,7 @@ public class Deadline extends Task {
     }
 
     @Override
-    String getFullDescription() {
+    public String getFullDescription() {
         return getTaskType() + super.toString() + " (by: " + due.format(VIEW_FMT) + ")";
     }
 
