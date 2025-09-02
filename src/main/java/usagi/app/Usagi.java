@@ -1,10 +1,10 @@
-package Usagi.app;
+package usagi.app;
 
-import Usagi.exception.UsagiException;
-import Usagi.parser.Parser;
-import Usagi.storage.Storage;
-import Usagi.task.TaskList;
-import Usagi.ui.Ui;
+import usagi.exception.UsagiException;
+import usagi.parser.Parser;
+import usagi.storage.Storage;
+import usagi.task.TaskList;
+import usagi.ui.Ui;
 
 import java.io.IOException;
 

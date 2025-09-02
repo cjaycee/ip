@@ -1,4 +1,4 @@
-package Usagi.exception;
+package usagi.exception;
 
 public class InvalidFormatException extends UsagiException {
     public InvalidFormatException(String correctFormat) {

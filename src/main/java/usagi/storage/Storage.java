@@ -1,10 +1,10 @@
-package Usagi.storage;
+package usagi.storage;
 
-import Usagi.task.Deadline;
-import Usagi.task.Event;
-import Usagi.task.Task;
-import Usagi.task.TaskList;
-import Usagi.task.Todo;
+import usagi.task.Deadline;
+import usagi.task.Event;
+import usagi.task.Task;
+import usagi.task.TaskList;
+import usagi.task.Todo;
 
 import java.io.File;
 import java.io.FileWriter;

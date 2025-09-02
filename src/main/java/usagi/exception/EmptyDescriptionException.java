@@ -1,4 +1,4 @@
-package Usagi.exception;
+package usagi.exception;
 
 public class EmptyDescriptionException extends UsagiException {
     public EmptyDescriptionException(String taskType) {

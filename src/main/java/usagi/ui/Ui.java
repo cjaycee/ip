@@ -1,7 +1,7 @@
-package Usagi.ui;
+package usagi.ui;
 
-import Usagi.task.Task;
-import Usagi.task.TaskList;
+import usagi.task.Task;
+import usagi.task.TaskList;
 
 import java.util.Scanner;
 
@@ -11,7 +11,7 @@ import java.util.Scanner;
  */
 public class Ui {
 
-    private static final String APPLICATION_NAME = "Usagi";
+    private static final String APPLICATION_NAME = "usagi";
     private static final String HORIZONTAL_LINE = "____________________________________________________________";
     private Scanner scanner;
 

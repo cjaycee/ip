@@ -1,16 +1,16 @@
-package Usagi.parser;
+package usagi.parser;
 
-import Usagi.exception.EmptyDescriptionException;
-import Usagi.exception.InvalidCommandException;
-import Usagi.exception.InvalidFormatException;
-import Usagi.exception.InvalidTaskNumberException;
-import Usagi.exception.UsagiException;
-import Usagi.task.Deadline;
-import Usagi.task.Event;
-import Usagi.task.Task;
-import Usagi.task.TaskList;
-import Usagi.task.Todo;
-import Usagi.ui.Ui;
+import usagi.exception.EmptyDescriptionException;
+import usagi.exception.InvalidCommandException;
+import usagi.exception.InvalidFormatException;
+import usagi.exception.InvalidTaskNumberException;
+import usagi.exception.UsagiException;
+import usagi.task.Deadline;
+import usagi.task.Event;
+import usagi.task.Task;
+import usagi.task.TaskList;
+import usagi.task.Todo;
+import usagi.ui.Ui;
 
 /**
  * Parses user input commands and executes corresponding operations on tasks.

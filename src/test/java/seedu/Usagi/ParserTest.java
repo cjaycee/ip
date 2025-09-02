@@ -7,13 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import Usagi.exception.InvalidCommandException;
-import Usagi.exception.InvalidTaskNumberException;
-import Usagi.exception.UsagiException;
-import Usagi.parser.Parser;
-import Usagi.task.TaskList;
-import Usagi.task.Todo;
-import Usagi.ui.Ui;
+import usagi.exception.InvalidCommandException;
+import usagi.exception.InvalidTaskNumberException;
+import usagi.exception.UsagiException;
+import usagi.parser.Parser;
+import usagi.task.TaskList;
+import usagi.task.Todo;
+import usagi.ui.Ui;
 
 /**
  * JUnit tests for the Parser class interpretCommand method.

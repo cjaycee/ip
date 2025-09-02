@@ -1,4 +1,4 @@
-package Usagi.task;
+package usagi.task;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package Usagi.task;
+package usagi.task;
 
 /**
  * Represents a generic task with a description and completion status.

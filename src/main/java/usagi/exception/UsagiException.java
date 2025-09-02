@@ -1,4 +1,4 @@
-package Usagi.exception;
+package usagi.exception;
 
 public class UsagiException extends Exception {
     public UsagiException(String message) {

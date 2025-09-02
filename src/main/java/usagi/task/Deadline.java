@@ -1,11 +1,11 @@
-package Usagi.task;
+package usagi.task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 /**
- * Represents a Usagi.task.Deadline task with a due date
+ * Represents a usagi.task.Deadline task with a due date
  * Due date should be in the format: yyyy-MM-dd
  */
 public class Deadline extends Task {
