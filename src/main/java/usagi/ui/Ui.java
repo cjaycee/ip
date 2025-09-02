@@ -154,4 +154,23 @@ public class Ui {
         System.out.println("  " + task.toString());
         this.printLine();
     }
+
+    /**
+     * Displays search results for tasks containing the specified keyword.
+     *
+     * @param matchingTasks TaskList containing tasks that match the search.
+     * @param keyword The keyword that was searched for.
+     */
+    public void displaySearchResults(TaskList matchingTasks, String keyword) {
+        this.printLine();
+        if (matchingTasks.isEmpty()) {
+            System.out.println("No tasks found containing: " + keyword);
+        } else {
+            System.out.println("Here are the matching tasks in your list:");
+            for (int i = 0; i < matchingTasks.size(); i++) {
+                System.out.println(" " + (i + 1) + "." + matchingTasks.get(i).toString());
+            }
+        }
+        this.printLine();
+    }
 }

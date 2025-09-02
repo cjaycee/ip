@@ -14,13 +14,13 @@ import usagi.ui.Ui;
 
 /**
  * Parses user input commands and executes corresponding operations on tasks.
- * Handles various command types including task creation, marking, deletion, and listing.
+ * Handles various command types including task creation, marking, deletion, listing, and searching.
  */
 public class Parser {
 
     /**
      * Interprets and executes the given user command.
-     * Supports commands: bye, list, mark, unmark, todo, deadline, event, delete.
+     * Supports commands: bye, list, mark, unmark, todo, deadline, event, delete, find.
      *
      * @param input User input command string.
      * @param ui User interface for displaying messages.
@@ -44,9 +44,38 @@ public class Parser {
             addEventTask(ui, tasks, input);
         } else if (input.startsWith("delete ")) {
             deleteTask(ui, tasks, input);
+        } else if (input.startsWith("find ")) {
+            findTasks(ui, tasks, input);
         } else if (!input.isEmpty()) {
             throw new InvalidCommandException();
         }
+    }
+
+    /**
+     * Searches for tasks containing the specified keyword in their description.
+     *
+     * @param ui User interface for displaying messages.
+     * @param tasks Task list to search through.
+     * @param input Command string in format "find <keyword>".
+     * @throws UsagiException If the keyword is empty.
+     */
+    private static void findTasks(Ui ui, TaskList tasks, String input) throws UsagiException {
+        String keyword = input.substring(5).trim();
+        if (keyword.isEmpty()) {
+            throw new EmptyDescriptionException("find");
+        }
+
+        TaskList matchingTasks = new TaskList();
+
+        // Search through all tasks for the keyword (case-insensitive)
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            if (task.getFullDescription().toLowerCase().contains(keyword.toLowerCase())) {
+                matchingTasks.add(task);
+            }
+        }
+
+        ui.displaySearchResults(matchingTasks, keyword);
     }
 
     /**
