@@ -9,8 +9,7 @@ import usagi.ui.Ui;
 import java.io.IOException;
 
 /**
- * Main application class for the Usagi task management system.
- * Handles initialization, user interaction loop, and data persistence.
+ * Main application class for the Usagi chatbot
  */
 public class Usagi {
 
