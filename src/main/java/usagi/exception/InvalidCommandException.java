@@ -1,4 +1,4 @@
-package Usagi.exception;
+package usagi.exception;
 
 public class InvalidCommandException extends UsagiException {
     public InvalidCommandException() {

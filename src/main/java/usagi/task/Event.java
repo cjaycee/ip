@@ -1,11 +1,11 @@
-package Usagi.task;
+package usagi.task;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 /**
- * Represents an Usagi.task.Event task with a start and end time
+ * Represents an usagi.task.Event task with a start and end time
  * Start/end must be in the format: yyyy-MM-dd'T'HH:mm[:ss]
  */
 public class Event extends Task {

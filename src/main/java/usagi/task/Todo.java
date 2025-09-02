@@ -1,7 +1,7 @@
-package Usagi.task;
+package usagi.task;
 
 /**
- * Represents a Usagi.task.Todo task
+ * Represents a usagi.task.Todo task
  */
 public class Todo extends Task {
 

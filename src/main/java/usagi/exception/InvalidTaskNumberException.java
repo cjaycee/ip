@@ -1,4 +1,4 @@
-package Usagi.exception;
+package usagi.exception;
 
 public class InvalidTaskNumberException extends UsagiException {
     public InvalidTaskNumberException(int maxTasks) {
