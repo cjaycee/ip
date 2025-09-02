@@ -6,7 +6,7 @@ import java.time.format.DateTimeParseException;
 
 /**
  * Represents a usagi.task.Deadline task with a due date
- * Due date should be in the format: yyyy-MM-dd
+ * due date should be in the format: yyyy-MM-dd
  */
 public class Deadline extends Task {
     private static final DateTimeFormatter IO_FMT = DateTimeFormatter.ISO_LOCAL_DATE;   // e.g., 2025-08-29
@@ -20,7 +20,7 @@ public class Deadline extends Task {
         this.due = parseDue(dueDate);
     }
 
-    Deadline(String description, boolean isDone, String dueDate) {
+    public Deadline(String description, boolean isDone, String dueDate) {
         super(description, isDone);
         this.due = parseDue(dueDate);
     }
