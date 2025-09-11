@@ -28,46 +28,28 @@ public class Usagi {
         ui = new Ui();
         storage = new Storage(filePath);
         try {
-            tasks = new TaskList(storage.load().displayTasks());
+            tasks = storage.load();;
         } catch (IOException e) {
             ui.printErrorMessage(e.getMessage());
             tasks = new TaskList();
         }
     }
 
-    /**
-     * Starts the main application loop.
-     * Displays greeting, processes user commands until termination,
-     * and saves tasks to storage before exiting.
-     */
-    public void run() {
-        ui.greet();
-
-        while (ui.hasNextLine()) {
-            try {
-                String input = ui.readCommand();
-                Parser.interpretCommand(input, ui, tasks);
-            } catch (UsagiException e) {
-                ui.printErrorMessage(e.getMessage());
-            }
-        }
-
-        ui.closeScanner();
-
+    public String getResponse(String input) {
         try {
-            storage.save(tasks);
+            Parser.interpretCommand(input, this.ui, this.tasks);
+
+            if (!input.trim().equalsIgnoreCase("bye")) {
+                storage.save(this.tasks);
+            }
+
+            return ui.returnOutput();
+
+        } catch (UsagiException e) {
+            return "Oops! " + e.getMessage();
         } catch (IOException e) {
-            System.out.println("Something went wrong while reading the file: " + e.getMessage());
+            return "Error saving tasks: " + e.getMessage();
         }
     }
 
-    /**
-     * Entry point for the Usagi application.
-     * Creates and runs a new Usagi instance with default data file path.
-     *
-     * @param args Command line arguments (not used).
-     */
-    public static void main(String[] args) {
-        new Usagi("data/tasks.txt").run();
-    }
 }
