@@ -11,9 +11,10 @@ import java.util.Scanner;
  */
 public class Ui {
 
-    private static final String APPLICATION_NAME = "usagi";
+    private static final String APPLICATION_NAME = "Usagi";
     private static final String HORIZONTAL_LINE = "____________________________________________________________";
     private Scanner scanner;
+    private String output;
 
     /**
      * Creates a new Ui instance and initializes the input scanner.
@@ -48,22 +49,49 @@ public class Ui {
     }
 
     /**
-     * Displays the welcome greeting message to the user.
+     * Displays the welcome greeting message with available commands.
      */
     public void greet() {
-        this.printLine();
-        System.out.println("Hello! I'm " + APPLICATION_NAME + ", your friendly task manager!");
-        System.out.println("What can I do for you?");
-        this.printLine();
+        this.output = HORIZONTAL_LINE +
+                System.lineSeparator() +
+                "Hello! I'm " + APPLICATION_NAME + ", your friendly task manager!" +
+                System.lineSeparator() +
+                "What can I do for you?" +
+                System.lineSeparator() +
+                System.lineSeparator() +
+                "Here are the commands you can use:" +
+                System.lineSeparator() +
+                "• todo <description> - Add a todo task" +
+                System.lineSeparator() +
+                "• deadline <description> /by <yyyy-MM-dd> - Add a task with deadline" +
+                System.lineSeparator() +
+                "• event <description> /from <yyyy-MM-ddTHH:mm> /to <yyyy-MM-ddTHH:mm> - Add an event" +
+                System.lineSeparator() +
+                "• list - Show all your tasks" +
+                System.lineSeparator() +
+                "• mark <number> - Mark a task as done" +
+                System.lineSeparator() +
+                "• unmark <number> - Mark a task as not done" +
+                System.lineSeparator() +
+                "• delete <number> - Delete a task" +
+                System.lineSeparator() +
+                "• find <keyword> - Search for tasks containing keyword" +
+                System.lineSeparator() +
+                "• bye - Exit the application" +
+                System.lineSeparator() +
+                HORIZONTAL_LINE;
+        System.out.println(this.output);
     }
 
     /**
      * Displays the goodbye message when the application ends.
      */
     public void endConvo() {
-        this.printLine();
-        System.out.println("Bye. Hope to see you again soon!");
-        this.printLine();
+        this.output = HORIZONTAL_LINE +
+                System.lineSeparator() +
+                "Bye. Hope to see you again soon!" +
+                System.lineSeparator() +
+                HORIZONTAL_LINE;
     }
 
     /**
@@ -79,9 +107,12 @@ public class Ui {
      * @param message The error message to display.
      */
     public void printErrorMessage(String message) {
-        this.printLine();
-        System.out.println("Oops! " + message);
-        this.printLine();
+        this.output = HORIZONTAL_LINE +
+                System.lineSeparator() +
+                "Oops! " + message +
+                System.lineSeparator() +
+                HORIZONTAL_LINE;
+        System.out.println(this.output);
     }
 
     /**
@@ -91,16 +122,16 @@ public class Ui {
      * @param tasks The task list to display.
      */
     public void displayTaskList(TaskList tasks) {
-        this.printLine();
+        this.output = HORIZONTAL_LINE + System.lineSeparator();
         if (tasks.isEmpty()) {
-            System.out.println("Your list is empty! Add some tasks first.");
+            this.output = output + "Your list is empty! Add some tasks first." + System.lineSeparator();
         } else {
-            System.out.println("Here are the tasks in your list:");
+            this.output = output + "Here are the tasks in your list:" + System.lineSeparator();
             for (int i = 0; i < tasks.size(); i++) {
-                System.out.println((i + 1) + "." + tasks.get(i).toString());
+                this.output = output + (i + 1) + "." + tasks.get(i).toString() + System.lineSeparator();
             }
         }
-        this.printLine();
+        this.output = output + HORIZONTAL_LINE;
     }
 
     /**
@@ -110,11 +141,15 @@ public class Ui {
      * @param task The task that was added.
      */
     public void displayTaskAdded(TaskList tasks, Task task) {
-        this.printLine();
-        System.out.println("Got it. I've added this task:");
-        System.out.println("  " + task);
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        this.printLine();
+        this.output = HORIZONTAL_LINE +
+                System.lineSeparator() +
+                "Got it. I've added this task:" +
+                System.lineSeparator() +
+                "  " + task +
+                System.lineSeparator() +
+                "Now you have " + tasks.size() + " tasks in the list." +
+                System.lineSeparator() +
+                HORIZONTAL_LINE;
     }
 
     /**
@@ -124,11 +159,15 @@ public class Ui {
      * @param task The task that was deleted.
      */
     public void displayTaskDeleted(TaskList tasks, Task task) {
-        this.printLine();
-        System.out.println("Noted. I've removed this task:");
-        System.out.println("  " + task.toString());
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        this.printLine();
+        this.output = HORIZONTAL_LINE +
+                System.lineSeparator() +
+                "Noted. I've removed this task:" +
+                System.lineSeparator() +
+                "  " + task.toString() +
+                System.lineSeparator() +
+                "Now you have " + tasks.size() + " tasks in the list." +
+                System.lineSeparator() +
+                HORIZONTAL_LINE;
     }
 
     /**
@@ -137,10 +176,13 @@ public class Ui {
      * @param task The task that was marked as done.
      */
     public void displayMarked(Task task) {
-        this.printLine();
-        System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  " + task.toString());
-        this.printLine();
+        this.output = HORIZONTAL_LINE +
+                System.lineSeparator() +
+                "Nice! I've marked this task as done:" +
+                System.lineSeparator() +
+                "  " + task.toString() +
+                System.lineSeparator() +
+                HORIZONTAL_LINE;
     }
 
     /**
@@ -149,10 +191,13 @@ public class Ui {
      * @param task The task that was marked as not done.
      */
     public void displayUnmarked(Task task) {
-        this.printLine();
-        System.out.println("OK, I've marked this task as not done yet:");
-        System.out.println("  " + task.toString());
-        this.printLine();
+        this.output = HORIZONTAL_LINE +
+                System.lineSeparator() +
+                "OK, I've marked this task as not done yet:" +
+                System.lineSeparator() +
+                "  " + task.toString() +
+                System.lineSeparator() +
+                HORIZONTAL_LINE;
     }
 
     /**
@@ -162,15 +207,24 @@ public class Ui {
      * @param keyword The keyword that was searched for.
      */
     public void displaySearchResults(TaskList matchingTasks, String keyword) {
-        this.printLine();
+        this.output = HORIZONTAL_LINE + System.lineSeparator();
         if (matchingTasks.isEmpty()) {
-            System.out.println("No tasks found containing: " + keyword);
+            this.output = output + "No tasks found containing: " + keyword + System.lineSeparator();
         } else {
-            System.out.println("Here are the matching tasks in your list:");
+            this.output = output + "Here are the matching tasks in your list:" + System.lineSeparator();
             for (int i = 0; i < matchingTasks.size(); i++) {
-                System.out.println(" " + (i + 1) + "." + matchingTasks.get(i).toString());
+                this.output = output + " " + (i + 1) + "." + matchingTasks.get(i).toString() + System.lineSeparator();
             }
         }
-        this.printLine();
+        this.output = output + HORIZONTAL_LINE;
+    }
+
+    /**
+     * Returns the stored output.
+     *
+     * @return The stored output string.
+     */
+    public String returnOutput() {
+        return output;
     }
 }
