@@ -1,1 +1,2 @@
-T | 0 | eat cake
+T | 1 | eat cake
+T | 0 | cake

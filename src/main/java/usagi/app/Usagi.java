@@ -13,6 +13,10 @@ import java.io.IOException;
  */
 public class Usagi {
 
+    private static final String BYE_COMMAND = "bye";
+    private static final String ERROR_PREFIX = "Error saving tasks: ";
+    private static final String GENERIC_ERROR_PREFIX = "Oops! ";
+
     private final Storage storage;
     private TaskList tasks;
     private final Ui ui;
@@ -25,57 +29,99 @@ public class Usagi {
      * @param filePath Path to the file where tasks will be stored and loaded from.
      */
     public Usagi(String filePath) {
-        assert !filePath.isEmpty() : "File path cannot be empty";
-        assert !filePath.trim().isEmpty() : "File path cannot be empty or whitespace only";
+        validateFilePath(filePath);
 
-        ui = new Ui();
-        assert ui != null: "new Ui object must be created";
+        ui = createUi();
+        storage = createStorage(filePath);
+        tasks = initializeTasks();
+    }
 
-        storage = new Storage(filePath);
-        assert storage != null : "new Storage object must be created";
+    /**
+     * Processes user input and returns the appropriate response.
+     * Handles command interpretation, task saving, and error handling.
+     *
+     * @param input User input command string
+     * @return Response message to display to user
+     */
+    public String getResponse(String input) {
+        validateInputAndState(input);
+
         try {
-            tasks = storage.load();
-            assert tasks != null : "Loaded TaskList cannot be null";
+            return processCommand(input);
+        } catch (EmptyDescriptionException e) {
+            return createErrorResponse("Empty description error: ", e);
+        } catch (InvalidFormatException e) {
+            return createErrorResponse("Format error: ", e);
+        } catch (InvalidTaskNumberException e) {
+            return createErrorResponse("Invalid task number: ", e);
+        } catch (InvalidCommandException e) {
+            return createErrorResponse("Invalid command: ", e);
+        } catch (UsagiException e) {
+            return createErrorResponse(GENERIC_ERROR_PREFIX, e);
+        } catch (IOException e) {
+            return createErrorResponse(ERROR_PREFIX, e);
+        }
+    }
+
+    private void validateFilePath(String filePath) {
+        assert filePath != null : "File path cannot be null";
+        assert !filePath.isEmpty() : "File path cannot be empty";
+        assert !filePath.trim().isEmpty() : "File path cannot be whitespace only";
+    }
+
+    private Ui createUi() {
+        Ui newUi = new Ui();
+        assert newUi != null : "Ui object must be created successfully";
+        return newUi;
+    }
+
+    private Storage createStorage(String filePath) {
+        Storage newStorage = new Storage(filePath);
+        assert newStorage != null : "Storage object must be created successfully";
+        return newStorage;
+    }
+
+    private TaskList initializeTasks() {
+        try {
+            TaskList loadedTasks = storage.load();
+            assert loadedTasks != null : "Loaded TaskList cannot be null";
+            return loadedTasks;
         } catch (IOException e) {
             ui.printErrorMessage(e.getMessage());
-            tasks = new TaskList();
-            assert tasks != null : "Fallback TaskList cannot be null";
+            TaskList fallbackTasks = new TaskList();
+            assert fallbackTasks != null : "Fallback TaskList cannot be null";
+            return fallbackTasks;
         }
-
     }
 
-    public String getResponse(String input) {
+    private void validateInputAndState(String input) {
         assert input != null : "Input cannot be null";
-        assert tasks != null : "TaskList must be initialized before processing commands";
-        assert ui != null : "Ui must be initialized before processing commands";
-        assert storage != null : "Storage must be initialized before processing commands";
+        assert tasks != null : "TaskList must be initialized";
+        assert ui != null : "Ui must be initialized";
+        assert storage != null : "Storage must be initialized";
+    }
 
-        try {
-            Parser.interpretCommand(input, this.ui, this.tasks);
-            assert tasks != null : "TaskList should not become null after command processing";
+    private String processCommand(String input) throws UsagiException, IOException {
+        Parser.interpretCommand(input, ui, tasks);
+        assert tasks != null : "TaskList should not become null after processing";
 
-            if (!input.trim().equalsIgnoreCase("bye")) {
-                storage.save(this.tasks);
-            }
+        saveTasksIfNeeded(input);
 
-            String output = ui.returnOutput();
-            assert output != null : "UI output cannot be null";
+        String output = ui.returnOutput();
+        assert output != null : "UI output cannot be null";
 
-            return output;
+        return output;
+    }
 
-        } catch (EmptyDescriptionException e) {
-            return "Empty description error: " + e.getMessage();
-        } catch (InvalidFormatException e) {
-            return "Format error: " + e.getMessage();
-        } catch (InvalidTaskNumberException e) {
-            return "Invalid task number: " + e.getMessage();
-        } catch (InvalidCommandException e) {
-            return "Invalid command: " + e.getMessage();
-        } catch (UsagiException e) {
-            return "Oops! " + e.getMessage(); // Catch any other UsagiException
-        } catch (IOException e) {
-            return "Error saving tasks: " + e.getMessage();
+    private void saveTasksIfNeeded(String input) throws IOException {
+        boolean isByeCommand = input.trim().equalsIgnoreCase(BYE_COMMAND);
+        if (!isByeCommand) {
+            storage.save(tasks);
         }
     }
 
+    private String createErrorResponse(String prefix, Exception e) {
+        assert e.getMessage() != null : "Exception message should not be null";
+        return prefix + e.getMessage();
+    }
 }
