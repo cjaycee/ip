@@ -82,4 +82,17 @@ public class TaskList {
         return tasks;
     }
 
+    /**
+     * Checks whether the task list contains the specified task.
+     *
+     * @param task Task to search for
+     * @return true if the task is found in the list, false otherwise
+     */
+    public boolean contains(Task task) {
+        if (task == null) {
+            return false;
+        }
+        return tasks.contains(task);
+    }
+
 }

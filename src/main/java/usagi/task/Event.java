@@ -80,4 +80,13 @@ public class Event extends Task {
                 + start.format(IO_FMT) + " | " + end.format(IO_FMT);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Event event = (Event) obj;
+        return description.equals(event.description) &&
+                start.equals(event.start) &&
+                end.equals(event.end);
+    }
 }

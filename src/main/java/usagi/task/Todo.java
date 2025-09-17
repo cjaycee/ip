@@ -33,4 +33,11 @@ public class Todo extends Task {
         return "T | " + (isDone ? "1" : "0") + " | " + description;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Todo todo = (Todo) obj;
+        return description.equals(todo.description);
+    }
 }

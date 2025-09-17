@@ -63,4 +63,12 @@ public class Deadline extends Task {
         return "D | " + (isDone ? "1" : "0") + " | " + description + " | " + due.format(IO_FMT);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Deadline deadline = (Deadline) obj;
+        return description.equals(deadline.description) &&
+                due.equals(deadline.due);
+    }
 }
