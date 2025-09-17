@@ -86,9 +86,9 @@ public class Parser {
      * @return true if input is a task creation command, false otherwise
      */
     private static boolean isTaskCreationCommand(String input) {
-        return input.startsWith(CMD_TODO)
-                || input.startsWith(CMD_DEADLINE)
-                || input.startsWith(CMD_EVENT);
+        return input.equals(CMD_TODO.trim()) || input.startsWith(CMD_TODO)
+                || input.equals(CMD_DEADLINE.trim()) || input.startsWith(CMD_DEADLINE)
+                || input.equals(CMD_EVENT.trim()) || input.startsWith(CMD_EVENT);
     }
 
     /**
@@ -100,11 +100,11 @@ public class Parser {
      * @throws UsagiException If task creation fails
      */
     private static void handleTaskCreation(String input, Ui ui, TaskList tasks) throws UsagiException {
-        if (input.startsWith(CMD_TODO)) {
+        if (input.equals(CMD_TODO.trim()) || input.startsWith(CMD_TODO)) {
             addTodoTask(ui, tasks, input);
-        } else if (input.startsWith(CMD_DEADLINE)) {
+        } else if (input.equals(CMD_DEADLINE.trim()) || input.startsWith(CMD_DEADLINE)) {
             addDeadlineTask(ui, tasks, input);
-        } else if (input.startsWith(CMD_EVENT)) {
+        } else if (input.equals(CMD_EVENT.trim()) || input.startsWith(CMD_EVENT)) {
             addEventTask(ui, tasks, input);
         }
     }
@@ -315,6 +315,7 @@ public class Parser {
 
     /**
      * Extracts description from command input after removing the command prefix.
+     * Handles cases where user types just the command without space or description.
      *
      * @param input Full command input string
      * @param prefixLength Length of the command prefix to remove
@@ -323,10 +324,19 @@ public class Parser {
      * @throws UsagiException If description is empty
      */
     private static String extractDescription(String input, int prefixLength, String commandType) throws UsagiException {
-        String description = input.substring(prefixLength).trim();
+        String description;
+
+        // Handle case where input is exactly the command (e.g., "todo", "deadline", "event")
+        if (input.length() <= prefixLength) {
+            description = "";
+        } else {
+            description = input.substring(prefixLength).trim();
+        }
+
         if (description.isEmpty()) {
             throw new EmptyDescriptionException(commandType);
         }
+
         return description;
     }
 
