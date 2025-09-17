@@ -34,15 +34,15 @@ public class Parser {
             ui.endConvo();
         } else if (input.equalsIgnoreCase("list")) {
             ui.displayTaskList(tasks);
-        } else if (input.startsWith("mark")) {
+        } else if (input.startsWith("mark ")) {
             handleMarkCommand(ui, tasks, input, true);
-        } else if (input.startsWith("unmark")) {
+        } else if (input.startsWith("unmark ")) {
             handleMarkCommand(ui, tasks, input, false);
-        } else if (input.startsWith("todo")) {
+        } else if (input.startsWith("todo ")) {
             addTodoTask(ui, tasks, input);
-        } else if (input.startsWith("deadline")) {
+        } else if (input.startsWith("deadline ")) {
             addDeadlineTask(ui, tasks, input);
-        } else if (input.startsWith("event")) {
+        } else if (input.startsWith("event ")) {
             addEventTask(ui, tasks, input);
         } else if (input.startsWith("delete ")) {
             deleteTask(ui, tasks, input);
