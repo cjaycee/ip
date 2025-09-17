@@ -86,6 +86,15 @@ public class Ui {
     /**
      * Displays the goodbye message when the application ends.
      */
+    public void sayHi() {
+        this.output = System.lineSeparator() +
+                "What do you want from me again Momonga..." +
+                System.lineSeparator();
+    }
+
+    /**
+     * Displays the goodbye message when the application ends.
+     */
     public void endConvo() {
         this.output = HORIZONTAL_LINE +
                 System.lineSeparator() +

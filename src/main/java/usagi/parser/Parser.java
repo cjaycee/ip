@@ -28,19 +28,21 @@ public class Parser {
      * @throws UsagiException If the command is invalid or malformed.
      */
     public static void interpretCommand(String input, Ui ui, TaskList tasks) throws UsagiException {
-        if (input.equalsIgnoreCase("bye")) {
+        if (input.equalsIgnoreCase("hi")) {
+            ui.sayHi();
+        } else if (input.equalsIgnoreCase("bye")) {
             ui.endConvo();
         } else if (input.equalsIgnoreCase("list")) {
             ui.displayTaskList(tasks);
-        } else if (input.startsWith("mark ")) {
+        } else if (input.startsWith("mark")) {
             handleMarkCommand(ui, tasks, input, true);
-        } else if (input.startsWith("unmark ")) {
+        } else if (input.startsWith("unmark")) {
             handleMarkCommand(ui, tasks, input, false);
-        } else if (input.startsWith("todo ")) {
+        } else if (input.startsWith("todo")) {
             addTodoTask(ui, tasks, input);
-        } else if (input.startsWith("deadline ")) {
+        } else if (input.startsWith("deadline")) {
             addDeadlineTask(ui, tasks, input);
-        } else if (input.startsWith("event ")) {
+        } else if (input.startsWith("event")) {
             addEventTask(ui, tasks, input);
         } else if (input.startsWith("delete ")) {
             deleteTask(ui, tasks, input);
@@ -79,7 +81,7 @@ public class Parser {
     }
 
     /**
-     * Creates and adds a Todo task from the given input command.
+     * Creates and adds a y task from the given input command.
      *
      * @param ui User interface for displaying messages.
      * @param tasks Task list to add the task to.
