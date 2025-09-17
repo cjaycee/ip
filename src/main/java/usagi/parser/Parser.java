@@ -1,10 +1,6 @@
 package usagi.parser;
 
-import usagi.exception.EmptyDescriptionException;
-import usagi.exception.InvalidCommandException;
-import usagi.exception.InvalidFormatException;
-import usagi.exception.InvalidTaskNumberException;
-import usagi.exception.UsagiException;
+import usagi.exception.*;
 import usagi.task.Deadline;
 import usagi.task.Event;
 import usagi.task.Task;
@@ -176,6 +172,12 @@ public class Parser {
     private static void addTodoTask(Ui ui, TaskList tasks, String input) throws UsagiException {
         String description = extractDescription(input, TODO_PREFIX_LENGTH, "todo");
         Task task = new Todo(description);
+
+        if (checkDuplicate(task, tasks)) {
+            throw new DuplicateException("You already have this task in your task list!");
+
+        }
+
         addTaskToList(ui, tasks, task);
     }
 
@@ -199,6 +201,12 @@ public class Parser {
         validateDeadlineContent(description, dueDate);
 
         Task task = new Deadline(description, dueDate);
+
+        if (checkDuplicate(task, tasks)) {
+            throw new DuplicateException("You already have this task in your task list!");
+
+        }
+
         addTaskToList(ui, tasks, task);
     }
 
@@ -255,6 +263,12 @@ public class Parser {
         validateEventContent(description, from, to);
 
         Task task = new Event(description, from, to);
+
+        if (checkDuplicate(task, tasks)) {
+            throw new DuplicateException("You already have this task in your task list!");
+
+        }
+
         addTaskToList(ui, tasks, task);
     }
 
@@ -427,4 +441,9 @@ public class Parser {
     private static String getCommandName(boolean markAsDone) {
         return markAsDone ? "mark" : "unmark";
     }
+
+    private static boolean checkDuplicate(Task t, TaskList tasks) {
+        return tasks.contains(t);
+    }
+
 }

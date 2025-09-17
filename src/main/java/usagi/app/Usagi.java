@@ -56,6 +56,8 @@ public class Usagi {
             return createErrorResponse("Invalid task number: ", e);
         } catch (InvalidCommandException e) {
             return createErrorResponse("Invalid command: ", e);
+        } catch (DuplicateException e) {
+            return createErrorResponse("Duplicate task: ", e);
         } catch (UsagiException e) {
             return createErrorResponse(GENERIC_ERROR_PREFIX, e);
         } catch (IOException e) {
