@@ -49,11 +49,10 @@ test {
 }
 
 application {
-    mainClass.set("usagi.app.Main")
+    mainClass.set("usagi.app.Launcher")
 }
 
 shadowJar {
-    archiveFileName = 'usagi.jar'
     archiveBaseName = "usagi"
     archiveClassifier = null
 }
