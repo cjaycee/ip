@@ -1,6 +1,6 @@
 # Usagi User Guide
 
-Usagi is a simple task management chatbot that helps you keep track of your todos, deadlines, and events. Interact with Usagi through text commands to manage your task list efficiently.
+Usagi is a simple task management chatbot that helps you keep track of your todos, deadlines, and events. Chat with Usagi through text commands to manage your tasks efficiently!
 
 ## Quick Start
 
