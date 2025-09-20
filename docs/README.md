@@ -29,7 +29,7 @@ Add tasks with specific due dates. Use the format: `yyyy-MM-dd`
 **Example:** `deadline eat cake /by 2025-09-09`
 
 ```
-Got it. I've added this task: Lol
+Got it. I've added this task: 
 [D][ ] eat cake (by: Sep 9 2025)
 Now you have 2 tasks in the list.
 ```
